@@ -22,15 +22,15 @@ This project implements a secure e-authentication system using Firebase Authenti
 1. In the Firebase project settings, register your app and get your Firebase configuration
 2. Update the `firebase-config.js` file with your Firebase configuration details:
    ```js
-   const firebaseConfig = {
-     apiKey: "YOUR_API_KEY",
-     authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-     projectId: "YOUR_PROJECT_ID",
-     storageBucket: "YOUR_PROJECT_ID.appspot.com",
-     messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-     appId: "YOUR_APP_ID",
-     measurementId: "YOUR_MEASUREMENT_ID"
-   };
+  const firebaseConfig = {
+  apiKey: "AIzaSyBF9moWqWCqzWBQwKIhQqoer0GR_rejsyU",
+  authDomain: "e-authentication-96908.firebaseapp.com",
+  projectId: "e-authentication-96908",
+  storageBucket: "e-authentication-96908.appspot.com", // Fixed storage bucket URL
+  messagingSenderId: "1086728900655",
+  appId: "1:1086728900655:web:201b936eefaef2bc84b6da",
+  measurementId: "G-KDX7YCS3VE"
+};
    ```
 
 ### Running the Project
