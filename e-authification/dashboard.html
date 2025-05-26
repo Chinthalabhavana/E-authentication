@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Dashboard - E-Authentication System</title>
+        <!-- Firebase SDK -->
+        <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+        <!-- Firebase Config -->
+        <script src="firebase-config.js"></script>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f0f8ff;
+                margin: 0;
+                padding: 0;
+            }
+            .header {
+                background-color: #4285f4;
+                color: white;
+                padding: 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .header h1 {
+                margin: 0;
+            }
+            .logout-btn {
+                background-color: white;
+                color: #4285f4;
+                border: none;
+                padding: 10px 15px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: bold;
+            }
+            .container {
+                max-width: 1000px;
+                margin: 20px auto;
+                padding: 20px;
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            }
+            .user-info {
+                margin-bottom: 30px;
+                padding-bottom: 20px;
+                border-bottom: 1px solid #eee;
+            }
+            .user-info h2 {
+                color: #4285f4;
+                margin-top: 0;
+            }
+            .info-row {
+                margin-bottom: 10px;
+            }
+            .info-label {
+                font-weight: bold;
+                width: 150px;
+                display: inline-block;
+            }
+            .auth-history {
+                margin-top: 30px;
+            }
+            .auth-history h2 {
+                color: #4285f4;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 15px;
+            }
+            th, td {
+                padding: 12px;
+                text-align: left;
+                border-bottom: 1px solid #ddd;
+            }
+            th {
+                background-color: #f2f2f2;
+            }
+            .hidden {
+                display: none;
+            }
+            #loading {
+                text-align: center;
+                margin: 100px auto;
+                font-size: 18px;
+                color: #666;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>E-Authentication System Dashboard</h1>
+            <button id="logout-btn" class="logout-btn">Logout</button>
+        </div>
+        
+        <div id="loading">Loading your data...</div>
+        
+        <div id="dashboard-content" class="hidden">
+            <div class="container">
+                <div class="user-info">
+                    <h2>Your Profile</h2>
+                    <div class="info-row">
+                        <span class="info-label">Username:</span>
+                        <span id="username-display"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Email:</span>
+                        <span id="email-display"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Phone Number:</span>
+                        <span id="phone-display"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Account Created:</span>
+                        <span id="created-display"></span>
+                    </div>
+                </div>
+                
+                <div class="auth-history">
+                    <h2>Authentication History</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date/Time</th>
+                                <th>Authentication Method</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auth-history-table">
+                            <!-- Authentication history will be inserted here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <script src="dashboard.js"></script>
+    </body>
+</html>

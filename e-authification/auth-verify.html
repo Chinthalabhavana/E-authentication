@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Authentication Verification</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f8ff;
+            text-align: center;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #4285f4;
+        }
+        p {
+            margin-bottom: 20px;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 30px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-allow {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .btn-deny {
+            background-color: #f44336;
+            color: white;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Authentication Request</h2>
+        <p id="request-info">Someone is trying to log in to your account. Is this you?</p>
+        
+        <div class="buttons">
+            <button class="btn btn-allow" id="allow-btn">Allow</button>
+            <button class="btn btn-deny" id="deny-btn">Not Allow</button>
+        </div>
+        
+        <div id="message" class="message" style="display: none;"></div>
+    </div>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    
+    <!-- Firebase Config -->
+    <script src="firebase-config.js"></script>
+    
+    <!-- Connection status monitoring -->
+    <script>
+        // Monitor online status
+        let isOnline = navigator.onLine;
+        window.addEventListener('online', () => {
+            isOnline = true;
+            console.log('Application is online');
+            retryFirestoreOperations();
+        });
+        
+        window.addEventListener('offline', () => {
+            isOnline = false;
+            console.log('Application is offline');
+        });
+        
+        // Queue for failed operations
+        const pendingOperations = [];
+        
+        // Function to retry operations
+        function retryFirestoreOperations() {
+            if (pendingOperations.length > 0 && isOnline) {
+                console.log(`Retrying ${pendingOperations.length} pending operations`);
+                const operations = [...pendingOperations];
+                pendingOperations.length = 0; // Clear array
+                
+                operations.forEach(op => {
+                    op.execute()
+                        .catch(error => {
+                            console.error('Retry failed:', error);
+                            pendingOperations.push(op); // Re-queue if still failing
+                        });
+                });
+            }
+        }
+    </script>
+    
+    <script>
+        // Parse URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session');
+        const userId = urlParams.get('user');
+        
+        if (!sessionId || !userId) {
+            document.getElementById('request-info').textContent = 'Invalid authentication request.';
+            document.querySelector('.buttons').style.display = 'none';
+        } else {
+            document.getElementById('request-info').textContent = 
+                'Authentication request for user ID: ' + userId.substring(0, 6) + '...' +
+                ' (Session: ' + sessionId.substring(0, 6) + '...)';
+        }
+        
+        // Allow button click handler
+        document.getElementById('allow-btn').addEventListener('click', function() {
+            const messageDiv = document.getElementById('message');
+            messageDiv.style.display = 'block';
+            messageDiv.className = 'message success';
+            messageDiv.textContent = 'Authentication approved! You can close this window.';
+            
+            // Update Firestore with approval
+            if (sessionId && userId) {
+                const updateOperation = {
+                    execute: () => {
+                        return db.collection('authSessions').doc(sessionId).set({
+                            userId: userId,
+                            status: 'approved',
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                            lastUpdated: new Date().toISOString() // Additional timestamp for local tracking
+                        }, { merge: true }); // Use merge to avoid overwriting existing data
+                    }
+                };
+                
+                // Try to execute immediately
+                updateOperation.execute()
+                    .then(() => {
+                        console.log('Authentication approved!');
+                    })
+                    .catch((error) => {
+                        console.error('Error updating auth status:', error);
+                        messageDiv.className = 'message error';
+                        messageDiv.textContent = 'Error updating authentication status. Will retry when connection is restored.';
+                        
+                        // Queue for retry if we're offline or experiencing connection issues
+                        pendingOperations.push(updateOperation);
+                    });
+            }
+            
+            // Hide buttons
+            document.querySelector('.buttons').style.display = 'none';
+        });
+        
+        // Deny button click handler
+        document.getElementById('deny-btn').addEventListener('click', function() {
+            const messageDiv = document.getElementById('message');
+            messageDiv.style.display = 'block';
+            messageDiv.className = 'message error';
+            messageDiv.textContent = 'Authentication denied. This login attempt has been blocked.';
+            
+            // Update Firestore with denial
+            if (sessionId && userId) {
+                const denyOperation = {
+                    execute: () => {
+                        return db.collection('authSessions').doc(sessionId).set({
+                            userId: userId,
+                            status: 'denied',
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                            lastUpdated: new Date().toISOString() // Additional timestamp for local tracking
+                        }, { merge: true }); // Use merge to avoid overwriting existing data
+                    }
+                };
+                
+                // Try to execute immediately
+                denyOperation.execute()
+                    .then(() => {
+                        console.log('Authentication denied!');
+                    })
+                    .catch((error) => {
+                        console.error('Error updating auth status:', error);
+                        messageDiv.textContent = 'Error updating authentication status. Will retry when connection is restored.';
+                        
+                        // Queue for retry if we're offline or experiencing connection issues
+                        pendingOperations.push(denyOperation);
+                    });
+            }
+            
+            // Hide buttons
+            document.querySelector('.buttons').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
