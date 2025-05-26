@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Login with Firebase OTP</title>
+        <!-- Firebase SDK -->
+        <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+        <!-- Firebase Config -->
+        <script src="firebase-config.js"></script>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f0f8ff;
+                margin: 0;
+                padding: 20px;
+            }
+            .container {
+                max-width: 500px;
+                margin: 0 auto;
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            }
+            h2 {
+                text-align: center;
+                color: #4285f4;
+            }
+            .form-group {
+                margin-bottom: 15px;
+            }
+            label {
+                display: block;
+                margin-bottom: 5px;
+                font-weight: bold;
+            }
+            input[type="tel"],
+            input[type="text"] {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                box-sizing: border-box;
+            }
+            button {
+                background-color: #4285f4;
+                color: white;
+                border: none;
+                padding: 10px 15px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 16px;
+                margin-right: 10px;
+            }
+            button:hover {
+                background-color: #3b77db;
+            }
+            .hidden {
+                display: none;
+            }
+            #error-message {
+                color: red;
+                margin-top: 10px;
+            }
+            #success-message {
+                color: green;
+                margin-top: 10px;
+            }
+            .register-link {
+                text-align: center;
+                margin-top: 20px;
+            }
+            .register-link a {
+                color: #4285f4;
+                text-decoration: none;
+            }
+            .register-link a:hover {
+                text-decoration: underline;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2>Login</h2>
+            <!-- Login Form -->
+            <div id="login-form">
+                <div class="form-group">
+                    <label for="phone">Mobile Number (with country code):</label>
+                    <input type="tel" id="phone" placeholder="+91xxxxxxxxxx" required>
+                </div>
+                <button type="button" id="login-btn">Send OTP</button>
+            </div>
+
+            <!-- Phone Authentication Div -->
+            <div id="phone-auth" class="hidden">
+                <p>We have sent an OTP to your phone. Please verify:</p>
+                <div class="form-group">
+                    <label for="verification-code">Enter OTP:</label>
+                    <input type="text" id="verification-code" placeholder="6-digit OTP">
+                </div>
+                <button type="button" id="verify-btn">Verify OTP</button>
+                <button type="button" id="resend-btn">Resend OTP</button>
+            </div>
+
+            <!-- QR Code Section (shown after successful login) -->
+            <div id="qr-section" class="hidden">
+                <h3>Scan QR Code for Two-Factor Authentication</h3>
+                <div id="qrcode-container" style="text-align: center; margin: 20px 0;"></div>
+                <p id="scan-status">Waiting for mobile verification...</p>
+            </div>
+
+            <div id="error-message"></div>
+            <div id="success-message"></div>
+
+            <div class="register-link">
+                Don't have an account? <a href="Simple registration.html">Register here</a>
+            </div>
+        </div>
+
+        <!-- QR Code Library -->
+        <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+        <!-- Twilio Service -->
+        <script src="twilio-service.js"></script>
+        <script src="login.js"></script>
+    </body>
+</html>
