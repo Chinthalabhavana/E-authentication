@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>E-Authentication System</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="0;url=Simple%20registration.html">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f8ff;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #4285f4;
+        }
+        p {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        .loading {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(0,0,0,.3);
+            border-radius: 50%;
+            border-top-color: #4285f4;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>E-Authentication System</h1>
+        <p>Redirecting to registration page...</p>
+        <div class="loading"></div>
+        <p>If you are not redirected automatically, <a href="Simple registration.html">click here</a>.</p>
+    </div>
+    
+    <script>
+        // Fallback redirect in case the meta refresh doesn't work
+        setTimeout(function() {
+            window.location.href = "Simple registration.html";
+        }, 2000);
+    </script>
+</body>
+</html>
